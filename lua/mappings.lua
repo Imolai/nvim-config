@@ -104,7 +104,7 @@ keymap.set("n", "<leader>v", "printf('`[%s`]', getregtype()[0])", {
 })
 
 -- Always use very magic mode for searching
-keymap.set("n", "/", [[/\v]])
+-- keymap.set("n", "/", [[/\v]])
 
 -- Search in selected region
 -- xnoremap / :<C-U>call feedkeys('/\%>'.(line("'<")-1).'l\%<'.(line("'>")+1)."l")<CR>
@@ -160,11 +160,11 @@ keymap.set("n", "gB", '<cmd>call buf_utils#GoToBuffer(v:count, "backward")<cr>',
   desc = "go to buffer (backward)",
 })
 
--- Switch windows
+--[[ Switch windows
 keymap.set("n", "<left>", "<c-w>h")
 keymap.set("n", "<Right>", "<C-W>l")
 keymap.set("n", "<Up>", "<C-W>k")
-keymap.set("n", "<Down>", "<C-W>j")
+keymap.set("n", "<Down>", "<C-W>j")]]
 
 -- Text objects for URL
 keymap.set({ "x", "o" }, "iu", "<cmd>call text_obj#URL()<cr>", { desc = "URL text object" })

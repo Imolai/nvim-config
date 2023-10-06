@@ -7,7 +7,7 @@ PYTHON_INSTALLED=true
 
 # If Python has been installed, then we need to know whether Python is provided
 # by the system, or you have already installed Python under your HOME.
-SYSTEM_PYTHON=false
+SYSTEM_PYTHON=true
 
 # If SYSTEM_PYTHON is false, we need to decide whether to install
 # Anaconda (INSTALL_ANACONDA=true) or Miniconda (INSTALL_ANACONDA=false)
@@ -17,8 +17,8 @@ INSTALL_ANACONDA=false
 ADD_TO_SYSTEM_PATH=true
 
 # select which shell we are using
-USE_ZSH_SHELL=true
-USE_BASH_SHELL=false
+USE_ZSH_SHELL=false
+USE_BASH_SHELL=true
 
 if [[ ! -d "$HOME/packages/" ]]; then
     mkdir -p "$HOME/packages/"
@@ -26,6 +26,19 @@ fi
 
 if [[ ! -d "$HOME/tools/" ]]; then
     mkdir -p "$HOME/tools/"
+fi
+
+# There are systems (e.g. WSL) where the user only has a ~/.profile loader file initially, and the
+# ~/.bash_profile file does not exist. This ~/.profile loads the other shell settings from
+# ~/.bashrc. However, if later on someone, e.g. an installer, creates a ~/.bash_profile file next to
+# the ~/.profile, it will prevent (by its existence) the ~/.profile from loading automatically and
+# thus all the settings in ~/.bashrc (important environment variables, aliases, etc.) will be
+# missing for the user because they will not be loaded.
+BASH_PROFILE="$HOME/.bash_profile"
+if [[ "$USE_BASH_SHELL" == true ]]; then
+    if [[ -f "$HOME/.profile" ]]; then
+        BASH_PROFILE="$HOME/.profile"
+    fi
 fi
 
 #######################################################################
@@ -60,7 +73,7 @@ if [[ ! "$PYTHON_INSTALLED" = true ]]; then
 
     # Setting up environment variables
     if [[ "$ADD_TO_SYSTEM_PATH" = true ]] && [[ "$USE_BASH_SHELL" = true ]]; then
-        echo "export PATH=\"$CONDA_DIR/bin:\$PATH\"" >> "$HOME/.bash_profile"
+        echo "export PATH=\"$CONDA_DIR/bin:\$PATH\"" >> "$BASH_PROFILE"
     fi
 else
     echo "Python is already installed. Skip installing it."
@@ -68,7 +81,24 @@ fi
 
 # Install some Python packages used by Nvim plugins.
 echo "Installing Python packages"
-declare -a PY_PACKAGES=("pynvim" 'python-lsp-server[all]' "vim-vint" "python-lsp-isort" "pylsp-mypy" "python-lsp-black")
+declare -a PY_PACKAGES=("pynvim" 'python-lsp-server[all]' "vim-vint" "pylsp-mypy" "python-lsp-black")
+# python-lsp-isort removed from the list:
+# ( on:
+#     Python 3.10.12
+#     Linux E-5CG2026KTP 5.15.90.1-microsoft-standard-WSL2 #1 SMP Fri Jan 27 02:56:13 UTC 2023
+#     x86_64 x86_64 x86_64 GNU/Linux
+# )
+# WARNING: Generating metadata for package python-lsp-isort produced metadata for project name
+# unknown. Fix your #egg=python-lsp-isort fragments.
+# Discarding https:
+# //files.pythonhosted.org/packages/26/d1/30ae9c451f78da3f73cb3dbdfd9fe32055804a98bd2efe2b22d383ef3fe3/python-lsp-isort-0.1.tar.gz#sha256=f02948bc8e7549905032100e772f03464f7548afa96f07d744ff1f93cc58339a
+# (from https://pypi.org/simple/python-lsp-isort/) (requires-python:>=3.7): Requested unknown from
+# https:
+# //files.pythonhosted.org/packages/26/d1/30ae9c451f78da3f73cb3dbdfd9fe32055804a98bd2efe2b22d383ef3fe3/python-lsp-isort-0.1.tar.gz#sha256=f02948bc8e7549905032100e772f03464f7548afa96f07d744ff1f93cc58339a
+# has inconsistent name: filename has 'python-lsp-isort', but metadata has 'unknown'
+# ERROR: Could not find a version that satisfies the requirement python-lsp-isort (from versions:
+# 0.1)
+# ERROR: No matching distribution found for python-lsp-isort
 
 if [[ "$SYSTEM_PYTHON" = true ]]; then
     echo "Using system Python to install $(PY_PACKAGES)"
@@ -108,7 +138,7 @@ if [[ -z "$(command -v node)" ]]; then
     fi
 
     if [[ "$ADD_TO_SYSTEM_PATH" = true ]] && [[ "$USE_BASH_SHELL" = true ]]; then
-        echo "export PATH=\"$NODE_DIR/bin:\$PATH\"" >> "$HOME/.bash_profile"
+        echo "export PATH=\"$NODE_DIR/bin:\$PATH\"" >> "$BASH_PROFILE"
     fi
 else
     echo "Node.js is already installed. Skip installing it."
@@ -144,7 +174,7 @@ if [[ -z "$(command -v lua-language-server)" ]] && [[ ! -f "$LUA_LS_DIR/bin/lua-
     fi
 
     if [[ "$ADD_TO_SYSTEM_PATH" = true ]] && [[ "$USE_BASH_SHELL" = true ]]; then
-        echo "export PATH=\"$LUA_LS_DIR/bin:\$PATH\"" >> "$HOME/.bash_profile"
+        echo "export PATH=\"$LUA_LS_DIR/bin:\$PATH\"" >> "$BASH_PROFILE"
     fi
 else
     echo "lua-language-server is already installed. Skip installing it."
@@ -171,7 +201,7 @@ if [[ -z "$(command -v rg)" ]] && [[ ! -f "$RIPGREP_DIR/rg" ]]; then
     fi
 
     if [[ "$ADD_TO_SYSTEM_PATH" = true ]] && [[ "$USE_BASH_SHELL" = true ]]; then
-        echo "export PATH=\"$RIPGREP_DIR:\$PATH\"" >> "$HOME/.bash_profile"
+        echo "export PATH=\"$RIPGREP_DIR:\$PATH\"" >> "$BASH_PROFILE"
     fi
 
     # set up manpath and zsh completion for ripgrep
@@ -179,7 +209,7 @@ if [[ -z "$(command -v rg)" ]] && [[ ! -f "$RIPGREP_DIR/rg" ]]; then
     mv "$HOME/tools/ripgrep/doc/rg.1" "$HOME/tools/ripgrep/doc/man/man1"
 
     if [[ "$USE_BASH_SHELL" = true ]]; then
-        echo 'export MANPATH=$HOME/tools/ripgrep/doc/man:$MANPATH' >> "$HOME/.bash_profile"
+        echo 'export MANPATH=$HOME/tools/ripgrep/doc/man:$MANPATH' >> "$BASH_PROFILE"
     else
         echo 'export MANPATH=$HOME/tools/ripgrep/doc/man:$MANPATH' >> "$HOME/.zshrc"
         echo 'export FPATH=$HOME/tools/ripgrep/complete:$FPATH' >> "$HOME/.zshrc"
@@ -209,7 +239,7 @@ if [[ ! -f "$CTAGS_DIR/bin/ctags" ]]; then
     make -j && make install
 
     if [[ "$ADD_TO_SYSTEM_PATH" = true ]] && [[ "$USE_BASH_SHELL" = true ]]; then
-        echo "export PATH=\"$CTAGS_DIR/bin:\$PATH\"" >> "$HOME/.bash_profile"
+        echo "export PATH=\"$CTAGS_DIR/bin:\$PATH\"" >> "$BASH_PROFILE"
     fi
 else
     echo "ctags is already installed. Skip installing it."
@@ -238,7 +268,7 @@ if [[ ! -f "$NVIM_DIR/bin/nvim" ]]; then
     tar zxvf "$NVIM_SRC_NAME" --strip-components 1 -C "$NVIM_DIR"
 
     if [[ "$ADD_TO_SYSTEM_PATH" = true ]] && [[ "$USE_BASH_SHELL" = true ]]; then
-        echo "export PATH=\"$NVIM_DIR/bin:\$PATH\"" >> "$HOME/.bash_profile"
+        echo "export PATH=\"$NVIM_DIR/bin:\$PATH\"" >> "$BASH_PROFILE"
     fi
 else
     echo "Nvim is already installed. Skip installing it."

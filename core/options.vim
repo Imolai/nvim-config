@@ -1,3 +1,6 @@
+let g:my_indentation = 4
+let g:my_textwidth = 100
+
 scriptencoding utf-8
 
 " change fillchars for folding, vertical split, end of buffer, and message separator
@@ -40,15 +43,28 @@ set backup  " create backup for files
 set backupcopy=yes  " copy the original file to backupdir and overwrite it
 
 " General tab settings
-set tabstop=2       " number of visual spaces per TAB
-set softtabstop=2   " number of spaces in tab when editing
-set shiftwidth=2    " number of spaces to use for autoindent
-set expandtab       " expand tab to spaces so that tabs are spaces
+let &tabstop=g:my_indentation                    " number of visual spaces per TAB
+let &softtabstop=g:my_indentation                " number of spaces in tab when editing
+let &shiftwidth=g:my_indentation                 " number of spaces to use for autoindent
+set expandtab                                    " expand tab to spaces so that tabs are spaces
+set smarttab                                     " a <Tab> in an indent inserts 'shiftwidth' spaces"
+set autoindent                                   " automatically set the indent of a new line
+set smartindent                                  " do clever auto indenting
+let &textwidth=g:my_textwidth                    " line length above which to break a line
+set colorcolumn=+1                               " screen columns that are highlighted with ColorColumn: useful to align text"
+set cursorline                                   " enable highlighting of the current line
+set cursorcolumn                                 " enable highlighting of the current column
+
+" Search settings
+set incsearch                                    " show match for partly typed search command
+set hlsearch                                     " show match for partly typed search command
+set noignorecase                                 " don't be smart about case in search
 
 " Set matching pairs of characters and highlight matching brackets
 set matchpairs+=<:>,「:」,『:』,【:】,“:”,‘:’,《:》
 
-set number relativenumber  " Show line number and relative line number
+"set number relativenumber  " Show line number and relative line number
+set number  " Show line number
 
 " Ignore case in general, but become case-sensitive when uppercase is present
 set ignorecase smartcase
@@ -175,4 +191,4 @@ set diffopt+=internal,indent-heuristic,algorithm:histogram
 set diffopt+=linematch:60
 
 set nowrap  " do no wrap
-set noruler
+set ruler
