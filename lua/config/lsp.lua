@@ -136,7 +136,8 @@ if utils.executable("pylsp") then
           pylint = { enabled = true, executable = "pylint" },
           ruff = { enabled = false },
           pyflakes = { enabled = false },
-          pycodestyle = { enabled = false },
+          pycodestyle = { enabled = true },
+          pydocstyle = { enabled = true },
           -- type checker
           pylsp_mypy = {
             enabled = true,
@@ -147,7 +148,7 @@ if utils.executable("pylsp") then
           -- auto-completion options
           jedi_completion = { fuzzy = true },
           -- import sorting
-          isort = { enabled = true },
+          isort = { enabled = false },
         },
       },
     },
