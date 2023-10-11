@@ -489,6 +489,12 @@ local plugin_specs = {
       require("config.fidget-nvim")
     end,
   },
+  {
+    'jupyter-vim/jupyter-vim',
+    config = function()
+        -- Here, you can add configuration specific to jupyter-vim
+    end
+  },
 }
 
 -- configuration for lazy itself.
