@@ -280,7 +280,7 @@ if [[ -d "$NVIM_CONFIG_DIR" ]]; then
     mv "$NVIM_CONFIG_DIR" "$NVIM_CONFIG_DIR.backup"
 fi
 
-git clone --depth=1 https://github.com/jdhao/nvim-config.git "$NVIM_CONFIG_DIR"
+git clone --depth=1 https://github.com/Imolai/nvim-config.git "$NVIM_CONFIG_DIR"
 
 echo "Installing nvim plugins, please wait"
 "$NVIM_DIR/bin/nvim" -c "autocmd User LazyInstall quitall"  -c "lua require('lazy').install()"
